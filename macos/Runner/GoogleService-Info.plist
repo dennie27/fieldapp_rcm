@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>866219640103-shts4134hgmbving6dt4lbs4217cvnt5.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.866219640103-shts4134hgmbving6dt4lbs4217cvnt5</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>866219640103-0on1k0jbc6k8rf5tmaohltf5sr3pkpth.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyB8ny6hYYm7ycln62CdllYFYx8HLwsDgis</string>
+	<key>GCM_SENDER_ID</key>
+	<string>866219640103</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.fieldappRcm.RunnerTests</string>
+	<key>PROJECT_ID</key>
+	<string>fieldapp-a7447</string>
+	<key>STORAGE_BUCKET</key>
+	<string>fieldapp-a7447.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:866219640103:ios:0bf039ec5022d6f90a9502</string>
+	<key>DATABASE_URL</key>
+	<string>https://fieldapp-a7447-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>
