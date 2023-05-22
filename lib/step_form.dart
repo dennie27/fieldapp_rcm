@@ -524,6 +524,7 @@ class _TaskFormState extends State<TaskForm> {
           ),
           if (selectedTask ==  'Portfolio Quality' && selectedSubTask != null)
             Portfolio(
+              data: [],
               area: selectedarea,
                 subtask: selectedSubTask,
                 onSave: (value) {
@@ -532,31 +533,38 @@ class _TaskFormState extends State<TaskForm> {
           else if (
           selectedTask == 'Team Management')
             Team(
+              data: [],
+              area: selectedarea,
+              subtask: selectedSubTask,
               onSave: (value) {
                 widget.taskResult(value);
-              },
-              subtask: selectedSubTask??'',)
+              },)
           else if (selectedTask == 'Collection Drive')
               Collection(
-                  subtask: selectedSubTask ?? '',
-                  onSave: (value) {
-                    widget.taskResult(value);
-                  }
+                data: [],
+                onSave: (value) {
+                  widget.taskResult(value);
+                },
+                subtask: selectedSubTask??'',
+                area: selectedarea,
               )
             else if (selectedTask == 'Pilot/Process Management')
                 Pilot(
-                    subtask: selectedSubTask ?? '',
-                    onSave: (value) {
-                      widget.taskResult(value);
-                    }
+                  data: [],
+                  onSave: (value) {
+                    widget.taskResult(value);
+                  },
+                  subtask: selectedSubTask??'',
+                  area: selectedarea,
                 )
               else if (selectedTask == 'Customer Management')
                   CustomerManagement(
-                      subtask: selectedSubTask ?? '',
-                      onSave: (value) {
-                        widget.taskResult(value);
-                      }
-                  )
+                    data: [],
+                    onSave: (value) {
+                      widget.taskResult(value);
+                    },
+                    subtask: selectedSubTask??'',
+                    area: selectedarea,)
         ],
       ),
     );

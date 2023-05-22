@@ -25,25 +25,33 @@
   "auth": {
     "sunking": {
       "customAuth": false,
-      "dependsOn": [],
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "sunkingPreSignup",
+          "triggerProvider": "Cognito"
+        }
+      ],
       "frontendAuthConfig": {
         "mfaConfiguration": "OFF",
         "mfaTypes": [
           "SMS"
         ],
         "passwordProtectionSettings": {
-          "passwordPolicyCharacters": [
-            "REQUIRES_LOWERCASE",
-            "REQUIRES_NUMBERS",
-            "REQUIRES_SYMBOLS",
-            "REQUIRES_UPPERCASE"
-          ],
+          "passwordPolicyCharacters": [],
           "passwordPolicyMinLength": 8
         },
-        "signupAttributes": [],
-        "socialProviders": [
-          "GOOGLE"
+        "signupAttributes": [
+          "EMAIL",
+          "NAME",
+          "GENDER",
+          "PHONE_NUMBER"
         ],
+        "socialProviders": [],
         "usernameAttributes": [
           "EMAIL"
         ],
@@ -55,7 +63,22 @@
       "service": "Cognito"
     }
   },
+  "function": {
+    "sunkingPreSignup": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
   "parameters": {
+    "AMPLIFY_function_sunkingPreSignup_DOMAINALLOWLIST": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sunkingPreSignup"
+        }
+      ]
+    },
     "AMPLIFY_storage_sunkinga9792733_bucketName": {
       "usedBy": [
         {

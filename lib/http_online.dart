@@ -450,7 +450,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Name: ${items[0]}'),
+                    Text('Name: ${customer}'),
                     SizedBox(height: 8),
                     Text("Priority: ${action1!['priority']}"),
                     Text("Action Plan: ${action1!['action']}"),
@@ -505,12 +505,12 @@ class _PreviewScreenState extends State<PreviewScreen> {
               children: widget.customers!.map((customer) {
                 Map<String, String>? action1 = widget.actions[customer];
                 List<String> items = customer.split("-");
-                String? perc = items[1].substring(0, items[1].length - 1);
+               // String? perc = items[1].substring(0, items[1].length - 1);
                 //double total = double.parse(action1!['target']!)+double.parse(perc!);
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Name: ${items[0]}'),
+                    Text('Name: ${customer}'),
                     SizedBox(height: 8),
                     Text("Priority: ${action1!['priority']}"),
                     Text("Action Plan: ${action1!['action']}"),

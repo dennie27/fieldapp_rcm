@@ -15,17 +15,17 @@ class Portfolio extends StatefulWidget {
   final Function(List?) onSave;
   final String? subtask;
   final String? area;
+  final List? data;
 
-  Portfolio({this.area,required this.subtask,required this.onSave});
+  Portfolio({required this.data,required this.area,required this.subtask,required this.onSave});
   @override
   State<Portfolio> createState() => _PortfolioState();
 }
 
 class _PortfolioState extends State<Portfolio> {
   List<String> _data = [];
-  List? data = [];
-  Future<StorageItem?> listItems() async {
-    print("ddsd");
+  List? dataTask = [];
+  /*Future<StorageItem?> listItems(key) async {
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
       operation = await Amplify.Storage.list(
@@ -36,17 +36,19 @@ class _PortfolioState extends State<Portfolio> {
       );
 
       Future<StorageListResult<StorageItem>> result = operation.result;
-
       List<StorageItem> resultList = (await operation.result).items;
-      resultList = resultList.where((file) => file.key.contains("key")).toList();
+      resultList = resultList.where((file) => file.key.contains(key)).toList();
       if (resultList.isNotEmpty) {
         // Sort the files by the last modified timestamp in descending order
         resultList.sort((a, b) => b.lastModified!.compareTo(a.lastModified!));
-        print(resultList.first);
+        StorageItem latestFile = resultList.first;
+        print(latestFile.key);
+        print("Key: $key");
+        getTask(latestFile.key);
         return resultList.first;
 
       } else {
-        print('No files found in the S3 bucket with key containing "key".');
+        print('No files found in the S3 bucket with key containing "$key".');
         return null;
       }
 
@@ -61,82 +63,210 @@ class _PortfolioState extends State<Portfolio> {
       safePrint('Error listing items: $e');
     }
   }
-  Future<StorageItem?> getLatestModifiedFile(String keyContains) async {
-    try {
-      List<StorageItem> files = (await Amplify.Storage.list()) as List<StorageItem>; // Retrieve the list of files from the S3 bucket
 
-      // Filter files by the key containing the specified string
-      files = files.where((file) => file.key.contains(keyContains)).toList();
-
-      if (files.isNotEmpty) {
-        // Sort the files by the last modified timestamp in descending order
-        files.sort((a, b) => b.lastModified!.compareTo(a.lastModified!));
-        print(files.first);
-        return files.first;
-
-      } else {
-        print('No files found in the S3 bucket with key containing "$keyContains".');
-        return null;
-      }
-    } catch (e) {
-      print('Error retrieving files: $e');
-      return null;
-    }
-  }
-
-  Future<void> getTask() async {
+  Future<void> getTask(key) async {
     List<Map<String, dynamic>>  uniqueAgentList = [];
 
     try {
       StorageGetPropertiesResult<StorageItem> result =
       await Amplify.Storage.getProperties(
-        key: 'Agents_with_low_welcome_calls_2023-05-05T0940_wyTm57.json',
+        key: key,
       ).result;
-      StorageGetUrlRequest fileResult = await Amplify.Storage.getUrl(
-          key: 'Agents_with_low_welcome_calls_2023-05-05T0940_wyTm57.json')
-          .request;
-      StorageItem dd = result.storageItem;
       StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
-          key: 'Agents_with_low_welcome_calls_2023-05-05T0940_wyTm57.json')
+          key: key)
           .result;
       final response = await http.get(urlResult.url);
-      final jsonData = jsonDecode(response.body);
+      final jsonresult = jsonDecode(response.body);
+      final jsonData = jsonresult.where((item) => item['Area'] == widget.area).toList();
       //List<dynamic> jsonDataList = jsonDecode(jsonData);
-      for (var item in jsonData) {
-        String agent = item['Agent'];
-        String unreachabilityRate = item['%Unreachabled rate within SLA'];
-        Map<String, String> dataagent = {
-          'display': '$agent - $unreachabilityRate',
-          'value': '$agent - $unreachabilityRate',
-        };
-        Map<String, dynamic> dataItem = {
-          'display': '$agent - $unreachabilityRate',
-          'value': '$agent - $unreachabilityRate',
-        };
-        data?.add(dataItem);
-        uniqueAgentList.add(dataItem);
+      if(widget.subtask == 'Visiting unreachable welcome call clients'){
+        for (var item in jsonData) {
+          String agent = item['Agent'];
+          String unreachabilityRate = item['%Unreachabled rate within SLA'];
+          Map<String, String> dataagent = {
+            'display': '$agent - $unreachabilityRate',
+            'value': '$agent - $unreachabilityRate',
+          };
+          Map<String, dynamic> dataItem = {
+            'display': '$agent - $unreachabilityRate',
+            'value': '$agent - $unreachabilityRate',
+          };
+          data?.add(dataItem);
+          uniqueAgentList.add(dataItem);
+        }
+      }else if(widget.subtask == 'Work with the Agents with low welcome calls to improve'){
+        for (var item in jsonData) {
+          String agent = item['Agent'];
+          String unreachabilityRate = item['%Unreachabled rate within SLA'];
+          Map<String, String> dataagent = {
+            'display': '$agent - $unreachabilityRate',
+            'value': '$agent - $unreachabilityRate',
+          };
+          Map<String, dynamic> dataItem = {
+            'display': '$agent - $unreachabilityRate',
+            'value': '$agent - $unreachabilityRate',
+          };
+          data?.add(dataItem);
+          uniqueAgentList.add(dataItem);
+        }
+      }else if(widget.subtask == 'Change a red zone CSAT area to orange'){
+        for (var item in jsonData) {
+          String CustomerName = item['Customer Name'];
+          String AngazaID = item['Angaza ID'];
+          Map<String, dynamic> dataItem = {
+            'display': '$CustomerName - $AngazaID',
+            'value': '$CustomerName - $AngazaID',
+          };
+          data?.add(dataItem);
+          uniqueAgentList.add(dataItem);
+        }
+      }else if(widget.subtask == 'Attend to Fraud Cases'){
+        for (var item in jsonData) {
+          String Suspect = item['Suspect Name'];
+          String Account = item['Account Number'];
+
+          Map<String, dynamic> dataItem = {
+            'display': '$Suspect - $Account',
+            'value': '$Suspect - $Account',
+          };
+          data?.add(dataItem);
+          uniqueAgentList.add(dataItem);
+        }
+      }else if(widget.subtask == 'Visit at-risk accounts'){
+        for (var item in jsonData) {
+          String agent = item['Agent'];
+          String unreachabilityRate = item['%Unreachabled rate within SLA'];
+          Map<String, String> dataagent = {
+            'display': '$agent - $unreachabilityRate',
+            'value': '$agent - $unreachabilityRate',
+          };
+          Map<String, dynamic> dataItem = {
+            'display': '$agent - $unreachabilityRate',
+            'value': '$agent - $unreachabilityRate',
+          };
+          data?.add(dataItem);
+          uniqueAgentList.add(dataItem);
+        }
+      }else if(widget.subtask == 'Visits FPD/SPDs'){
+        for (var item in jsonData) {
+          String agent = item['Agent'];
+          String unreachabilityRate = item['%Unreachabled rate within SLA'];
+          Map<String, dynamic> dataItem = {
+            'display': '$agent',
+            'value': '$agent',
+          };
+          data?.add(dataItem);
+          uniqueAgentList.add(dataItem);
+        }
       }
 
+
+
       setState(() {
-        safePrint('File team: $uniqueAgentList');
+        safePrint('File_team: $uniqueAgentList');
       });
     } on StorageException catch (e) {
       safePrint('Could not retrieve properties: ${e.message}');
       rethrow;
     }
+  }*/
+  Future<void> getTaskList() async {
+    List<Map<String, dynamic>>  uniqueAgentList = [];
+      final jsonresult = widget.data;
+      final jsonData = jsonresult?.where((item) => item['Area'] == widget.area).toList();
+      //List<dynamic> jsonDataList = jsonDecode(jsonData);
+      if(widget.subtask == 'Visiting unreachable welcome call clients'){
+        for (var item in jsonData!) {
+          String agent = item['Agent'];
+          String unreachabilityRate = item['%Unreachabled rate within SLA'];
+          Map<String, String> dataagent = {
+            'display': '$agent - $unreachabilityRate',
+            'value': '$agent - $unreachabilityRate',
+          };
+          Map<String, dynamic> dataItem = {
+            'display': '$agent - $unreachabilityRate',
+            'value': '$agent - $unreachabilityRate',
+          };
+          dataTask?.add(dataItem);
+          uniqueAgentList.add(dataItem);
+        }
+      }else if(widget.subtask == 'Work with the Agents with low welcome calls to improve'){
+        for (var item in jsonData!) {
+          String agent = item['Agent'];
+          String unreachabilityRate = item['%Unreachabled rate within SLA'];
+          Map<String, String> dataagent = {
+            'display': '$agent - $unreachabilityRate',
+            'value': '$agent - $unreachabilityRate',
+          };
+          Map<String, dynamic> dataItem = {
+            'display': '$agent - $unreachabilityRate',
+            'value': '$agent - $unreachabilityRate',
+          };
+          dataTask?.add(dataItem);
+          uniqueAgentList.add(dataItem);
+        }
+      }else if(widget.subtask == 'Change a red zone CSAT area to orange'){
+        for (var item in jsonData!) {
+          String CustomerName = item['Customer Name'];
+          String AngazaID = item['Angaza ID'];
+          Map<String, dynamic> dataItem = {
+            'display': '$CustomerName - $AngazaID',
+            'value': '$CustomerName - $AngazaID',
+          };
+          dataTask?.add(dataItem);
+          uniqueAgentList.add(dataItem);
+        }
+      }else if(widget.subtask == 'Attend to Fraud Cases'){
+        for (var item in jsonData!) {
+          String Suspect = item['Suspect Name'];
+          String Account = item['Account Number'];
+
+          Map<String, dynamic> dataItem = {
+            'display': '$Suspect - $Account',
+            'value': '$Suspect - $Account',
+          };
+          dataTask?.add(dataItem);
+          uniqueAgentList.add(dataItem);
+        }
+      }else if(widget.subtask == 'Visit at-risk accounts'){
+        for (var item in jsonData!) {
+          String agent = item['Agent'];
+          String unreachabilityRate = item['%Unreachabled rate within SLA'];
+          Map<String, String> dataagent = {
+            'display': '$agent - $unreachabilityRate',
+            'value': '$agent - $unreachabilityRate',
+          };
+          Map<String, dynamic> dataItem = {
+            'display': '$agent - $unreachabilityRate',
+            'value': '$agent - $unreachabilityRate',
+          };
+          dataTask?.add(dataItem);
+          uniqueAgentList.add(dataItem);
+        }
+      }else if(widget.subtask == 'Visits FPD/SPDs'){
+        for (var item in jsonData!) {
+          String agent = item['Agent'];
+          String unreachabilityRate = item['%Unreachabled rate within SLA'];
+          Map<String, dynamic> dataItem = {
+            'display': '$agent',
+            'value': '$agent',
+          };
+          dataTask?.add(dataItem);
+          uniqueAgentList.add(dataItem);
+        }
+      }
+
+
+
+      setState(() {
+        safePrint('File_team: $uniqueAgentList');
+      });
+
   }
   List? _mydata = [];
   initState() {
-    listItems();
-    getTask();
-    print(widget.subtask!.replaceAll('', "_"));
-
-    print("Dennis ${widget.subtask}");
-if(widget.subtask=='Work with the Agents with low welcome calls to improve'){
-//_getData();
-
-}
-
+    getTaskList();
+    //listItems(widget.subtask?.replaceAll(" ", "_"));
     super.initState();
   }
 
@@ -176,10 +306,28 @@ if(widget.subtask=='Work with the Agents with low welcome calls to improve'){
 
   @override
   Widget build(BuildContext context) {
-    String? _selectedValue;
     return Column(
       children: [
+
+
         SizedBox(height: 10,),
+    Column(
+    children: [
+    Text("Number of Task ${dataTask!.length}"),
+    AppMultselect(
+    title: widget.subtask!,
+    onSave: (value) {
+
+    widget.onSave(value);
+    if (value == null) return;
+
+    widget.onSave(value);
+    },
+    items: dataTask,
+
+
+    )
+/*
         if(widget.subtask == 'Visiting unreachable welcome call clients')
           Column(
             children: [
@@ -323,11 +471,9 @@ if(widget.subtask=='Work with the Agents with low welcome calls to improve'){
 
 
                 ),
-              ],
+              */],
             ),
-          ),
-      ],
-    );
+          ]);
   }
 }
 

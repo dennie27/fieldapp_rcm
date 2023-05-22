@@ -1,5 +1,4 @@
-import 'package:fieldapp_rcm/task_actions.dart';
-import 'package:fieldapp_rcm/utils/themes/theme.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 
 import '../widget/drop_down.dart';
@@ -7,43 +6,94 @@ import '../widget/drop_down.dart';
 
 class CustomerManagement extends StatefulWidget {
   final Function(List?) onSave;
-  String subtask;
+  final String? subtask;
+  final String? area;
+  final List? data;
 
-  CustomerManagement({required this.subtask,required this.onSave});
+  CustomerManagement(
+      {required this.data,
+    required this.area,
+    required this.subtask,
+    required this.onSave});
   @override
   State<CustomerManagement> createState() => _CustomerManagementState();
 }
 
 class _CustomerManagementState extends State<CustomerManagement> {
+  @override
+  initState() {
+    getTaskList();
+  }
+  Future<void> getTaskList() async {
+    List<Map<String, dynamic>> uniqueAgentList = [];
+    final jsonresult = widget.data;
+    final jsonData =
+    jsonresult?.where((item) => item['Area'] == widget.area).toList();
+    //List<dynamic> jsonDataList = jsonDecode(jsonData);
+    if (widget.subtask ==
+        'Visiting of issues raised') {
+      for (var item in jsonData!) {
+        String agent = item['Agent'];
+        String unreachabilityRate = item['%Unreachabled rate within SLA'];
+        Map<String, dynamic> dataItem = {
+          'display': '$agent - $unreachabilityRate',
+          'value': '$agent - $unreachabilityRate',
+        };
+        dataTask?.add(dataItem);
+        uniqueAgentList.add(dataItem);
+      }
+    } else if (widget.subtask == 'Repossession of customers needing repossession') {
+      for (var item in jsonData!) {
+        String agent = item['Agent'];
+        String unreachabilityRate = item['%Unreachabled rate within SLA'];
+        Map<String, dynamic> dataItem = {
+          'display': '$agent - $unreachabilityRate',
+          'value': '$agent - $unreachabilityRate',
+        };
+        dataTask?.add(dataItem);
+        uniqueAgentList.add(dataItem);
+      }
+    } else if (widget.subtask == 'Look at the number of replacements pending at the shops') {
+      for (var item in jsonData!) {
+        String customerName = item['Customer Name'];
+        String angazaID = item['Angaza ID'];
+        Map<String, dynamic> dataItem = {
+          'display': '$customerName - $angazaID',
+          'value': '$customerName - $angazaID',
+        };
+        dataTask?.add(dataItem);
+        uniqueAgentList.add(dataItem);
+      }
+    } else if (widget.subtask == 'Look at the number of repossession pending at the shops') {
+      for (var item in jsonData!) {
+        String suspect = item['Suspect Name'];
+        String account = item['Account Number'];
+
+        Map<String, dynamic> dataItem = {
+          'display': '$suspect - $account',
+          'value': '$suspect - $account',
+        };
+        dataTask?.add(dataItem);
+        uniqueAgentList.add(dataItem);
+      }
+    } else if (widget.subtask == 'Others') {
+      for (var item in jsonData!) {
+        String agent = item['Agent'];
+        Map<String, dynamic> dataItem = {
+          'display': agent,
+          'value': agent,
+        };
+        dataTask?.add(dataItem);
+        uniqueAgentList.add(dataItem);
+      }
+    }
+
+    setState(() {
+      safePrint('File_team: $uniqueAgentList');
+    });
+  }
   String? selectedSubTask;
-  List? _myActivities;
-  late String _myActivitiesResult;
-  List? data =   [
-    {
-      "display": "Customer 1",
-      "value": "Customer 1",
-    },
-    {
-      "display": "Customer 2",
-      "value": "Customer 2",
-    },
-    {
-      "display": "Customer 3",
-      "value": "Customer 3",
-    },
-    {
-      "display": "Customer 4",
-      "value": "Customer 4",
-    },
-    {
-      "display": "Customer 5",
-      "value": "CUstomer 5",
-    },
-    {
-      "display": "CUstomer 6",
-      "value": "Cusomtomer 6",
-    },
-  ];
+  List? dataTask = [];
   onSubTaskChanged(String? value) {
     setState(() {
       selectedSubTask = value;
@@ -52,104 +102,21 @@ class _CustomerManagementState extends State<CustomerManagement> {
 
   @override
   Widget build(BuildContext context) {
-    String? _selectedValue;
-    return Column(
-      children: [
-        SizedBox(height: 10,),
-        if(widget.subtask == 'Visiting of issues raised')
-          Column(
-            children: [
-              Text("Number of issue ${data!.length}"),
-              AppMultselect(
-                title: widget.subtask,
-                onSave: (value) {
-                  if (value == null) return;
-                  setState(() {
-                    _myActivities = value;
-                  });
-                },
-                items: data,
+    return Column(children: [
+      const SizedBox(
+        height: 10,
+      ),
+      AppMultselect(
+        title: widget.subtask!,
+        onSave: (value) {
+          widget.onSave(value);
+          if (value == null) return;
 
-
-              ),
-            ],
-          ),
-        if(widget.subtask == 'Repossession of customers needing repossession')
-          Column(
-            children: [
-              Text("Number of accounts ${data!.length}"),
-              AppMultselect(
-                title: widget.subtask,
-                onSave: (value) {
-                  if (value == null) return;
-                  setState(() {
-                    _myActivities = value;
-                  });
-                },
-                onChange: (value) {
-                  if (value == null) return;
-                  setState(() {
-                    _myActivities = value;
-                  });
-                },
-                items: data,
-
-
-              ),
-            ],
-          ),
-        if(widget.subtask == 'Look at the number of replacements pending at the shops')
-          Column(
-            children: [
-              Text("Number of accounts ${data!.length}"),
-              AppMultselect(
-                title: widget.subtask,
-                onSave: (value) {
-                  if (value == null) return;
-                  widget.onSave(value);
-                },
-                onChange: (value) {
-                  if (value == null) return;
-                  widget.onSave(value);
-                },
-                items: data,
-              ),
-            ],
-          ),
-        if(widget.subtask == 'Look at the number of repossession pending at the shops')
-          Column(
-            children: [
-              Text("Number of accounts ${data!.length}"),
-              AppMultselect(
-                title: widget.subtask,
-                onSave: (value) {
-                  if (value == null) return;
-                  widget.onSave(value);
-                },
-                onChange: (value) {
-                  if (value == null) return;
-                  widget.onSave(value);
-                },
-                items: data,
-              ),
-            ],
-          ),
-        if(widget.subtask== 'Others')
-          AppMultselect(
-            title: widget.subtask,
-            onSave: (value) {
-              if (value == null) return;
-              widget.onSave(value);
-            },
-            onChange: (value) {
-              if (value == null) return;
-              widget.onSave(value);
-            },
-            items: data,
-
-          ),
-      ],
-    );
+          widget.onSave(value);
+        },
+        items: dataTask,
+      )
+    ]);
   }
 }
 

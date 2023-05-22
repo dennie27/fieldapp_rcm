@@ -8,6 +8,7 @@ import 'package:fieldapp_rcm/utils/themes/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fieldapp_rcm/routing/nav_page.dart';
 import 'package:flutter/material.dart';
+import 'package:googleapis/servicecontrol/v2.dart';
 import 'package:http/http.dart' as http;
 import 'package:aws_s3_private_flutter/aws_s3_private_flutter.dart';
 import 'package:aws_s3_private_flutter/export.dart';
@@ -19,9 +20,7 @@ import 'firebase_options.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await _configureAmplify();
-  await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
 
   runApp(const MyApp());
@@ -54,13 +53,21 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    //listItems();
-    //uploadExampleData();
-   //getFileProperties();
-    //getFileFromS3Bucket();
-   // downloadToMemory("Agents_with_low_welcome_calls_2023-05-05T0940_wyTm57.json");
+    getUserAttributes();
   }
+  void getUserAttributes() async {
+    try {
+      AuthUser currentUser = await Amplify.Auth.getCurrentUser();
+      AuthUser userAttributes =
+      await Amplify.Auth.getCurrentUser();
 
+      // Process the user attributes
+
+        print('$userAttributes');
+    } catch (e) {
+      print('Error retrieving user attributes: $e');
+    }
+  }
   Future<void> downloadToMemory(String key) async {
     try {
       final result = await Amplify.Storage.downloadData(

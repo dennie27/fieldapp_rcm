@@ -14,8 +14,10 @@ import '../task.dart';
 
 class Team extends StatefulWidget {
   final Function(List?) onSave;
-  String? subtask;
-  Team({required this.subtask,required this.onSave});
+  final String? subtask;
+  final String? area;
+  final List? data;
+  Team({required this.data,required this.area,required this.subtask,required this.onSave});
   @override
   State<Team> createState() => _TeamState();
 }
@@ -24,28 +26,16 @@ class _TeamState extends State<Team> {
   String? selectedSubTask;
   List<Map<String, dynamic>> agentList = [];
   initState() {
-    getFileProperties();
+    getTaskList();
   }
-  List? data = [];
-  Future<void> getFileProperties() async {
+  List? dataTask = [];
+  Future<void> getTaskList() async {
     List<Map<String, dynamic>>  uniqueAgentList = [];
-
-    try {
-      StorageGetPropertiesResult<StorageItem> result =
-      await Amplify.Storage.getProperties(
-        key: 'Agents_with_low_welcome_calls_2023-05-14T0204_r95sHZ.json',
-      ).result;
-      StorageGetUrlRequest fileResult = await Amplify.Storage.getUrl(
-          key: 'Agents_with_low_welcome_calls_2023-05-14T0204_r95sHZ.json')
-          .request;
-      StorageItem dd = result.storageItem;
-      StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
-          key: 'Agents_with_low_welcome_calls_2023-05-14T0204_r95sHZ.json')
-          .result;
-      final response = await http.get(urlResult.url);
-      final jsonData = jsonDecode(response.body);
-      //List<dynamic> jsonDataList = jsonDecode(jsonData);
-      for (var item in jsonData) {
+    final jsonresult = widget.data;
+    final jsonData = jsonresult?.where((item) => item['Area'] == widget.area).toList();
+    //List<dynamic> jsonDataList = jsonDecode(jsonData);
+    if(widget.subtask == 'Assist a team member to improve the completion rate'){
+      for (var item in jsonData!) {
         String agent = item['Agent'];
         String unreachabilityRate = item['%Unreachabled rate within SLA'];
         Map<String, String> dataagent = {
@@ -56,21 +46,81 @@ class _TeamState extends State<Team> {
           'display': '$agent - $unreachabilityRate',
           'value': '$agent - $unreachabilityRate',
         };
-        data?.add(dataItem);
+        dataTask?.add(dataItem);
         uniqueAgentList.add(dataItem);
       }
+    }else if(widget.subtask == 'Raise a reminder to a team member'){
+      for (var item in jsonData!) {
+        String agent = item['Agent'];
+        String unreachabilityRate = item['%Unreachabled rate within SLA'];
+        Map<String, String> dataagent = {
+          'display': '$agent - $unreachabilityRate',
+          'value': '$agent - $unreachabilityRate',
+        };
+        Map<String, dynamic> dataItem = {
+          'display': '$agent - $unreachabilityRate',
+          'value': '$agent - $unreachabilityRate',
+        };
+        dataTask?.add(dataItem);
+        uniqueAgentList.add(dataItem);
+      }
+    }else if(widget.subtask == 'Raise a warning to a team member'){
+      for (var item in jsonData!) {
+        String CustomerName = item['Customer Name'];
+        String AngazaID = item['Angaza ID'];
+        Map<String, dynamic> dataItem = {
+          'display': '$CustomerName - $AngazaID',
+          'value': '$CustomerName - $AngazaID',
+        };
+        dataTask?.add(dataItem);
+        uniqueAgentList.add(dataItem);
+      }
+    }else if(widget.subtask == 'Raise a new task to a team member'){
+      for (var item in jsonData!) {
+        String Suspect = item['Suspect Name'];
+        String Account = item['Account Number'];
 
-      setState(() {
-        agentList = uniqueAgentList.toSet().toList();
-        safePrint('File team: $uniqueAgentList');
-      });
-
-      safePrint('File size: $dd');
-      safePrint('File team: $uniqueAgentList');
-    } on StorageException catch (e) {
-      safePrint('Could not retrieve properties: ${e.message}');
-      rethrow;
+        Map<String, dynamic> dataItem = {
+          'display': '$Suspect - $Account',
+          'value': '$Suspect - $Account',
+        };
+        dataTask?.add(dataItem);
+        uniqueAgentList.add(dataItem);
+      }
+    }else if(widget.subtask == 'Inform the team member of your next visit to his area, and planning needed'){
+      for (var item in jsonData!) {
+        String agent = item['Agent'];
+        String unreachabilityRate = item['%Unreachabled rate within SLA'];
+        Map<String, String> dataagent = {
+          'display': '$agent - $unreachabilityRate',
+          'value': '$agent - $unreachabilityRate',
+        };
+        Map<String, dynamic> dataItem = {
+          'display': '$agent - $unreachabilityRate',
+          'value': '$agent - $unreachabilityRate',
+        };
+        dataTask?.add(dataItem);
+        uniqueAgentList.add(dataItem);
+      }
+    }else if(widget.subtask == 'Other'){
+      for (var item in jsonData!) {
+        String agent = item['Agent'];
+        String unreachabilityRate = item['%Unreachabled rate within SLA'];
+        Map<String, dynamic> dataItem = {
+          'display': '$agent',
+          'value': '$agent',
+        };
+        dataTask?.add(dataItem);
+        uniqueAgentList.add(dataItem);
+      }
     }
+
+
+
+    setState(() {
+      safePrint('File_team: $uniqueAgentList');
+    });
+
   }
   onSubTaskChanged(String? value) {
     setState(() {
@@ -82,82 +132,26 @@ class _TeamState extends State<Team> {
   Widget build(BuildContext context) {
     String? _selectedValue;
     return Column(
-      children: [
-        SizedBox(height: 10,),
-        if(widget.subtask == 'Assist a team member to improve the completion rate')
-          Column(
-            children: [
-              AppMultselect(
-                  title: "Improve Completetion Rate",
-                  items: data,
-                  onSave: (value) {
-                    widget.onSave([value!]);
-                  }),
-              SizedBox(height: 10,),
-            ],
-          ),
-        if(widget.subtask == 'Raise a reminder to a team member')
-          Column(
-            children: [
-              AppMultselect(
-                  title: "Reminder",
-                  items: data,
-                  onSave: (value) {
-                    widget.onSave([value!]);
-                  }),
-            ],
-          ),
-        if(widget.subtask == 'Raise a warning to a team member')
-          Column(
-            children: [
-              AppMultselect(
-                  title: "Warning to a team member",
-                  items: data,
-                  onSave: (value) {
-                    widget.onSave([value!]);
-                  }),
-            ],
-          ),
-        if(widget.subtask == 'Raise a new task to a team member')
-          Column(
-            children: [
-              AppMultselect(
-                  title: "New Task",
-                  items: data,
-                  onSave: (value) {
-                    widget.onSave([value!]);
-                  }),
-            ],
-          ),
-        if(widget.subtask == 'Inform the team member of your next visit to his area, and planning needed')
-          Column(
-            children: [
-              AppMultselect(
-                  title: "Field Visit",
-                  items: data,
-                  onSave: (value) {
-                    widget.onSave([value!]);
-                  }),
-            ],
-          ),
-        if(widget.subtask== 'Others')
-          Column(
-            children: [
-              AppDropDown(
-                disable: false,
-                  label: "other",
-                  hint: "others",
-                  items: ['agentList'],
-                  onChanged: (value) {
-                    widget.onSave([value!]);
-                  }),
-            ],
-          ),
-      ],
+        children: [
+          SizedBox(height: 10,),
+          AppMultselect(
+            title: widget.subtask!,
+            onSave: (value) {
+
+              widget.onSave(value);
+              if (value == null) return;
+
+              widget.onSave(value);
+            },
+            items: dataTask,
+
+
+          )
+        ]
     );
   }
 }
-
+/*
 class TeamActionScreen extends StatefulWidget {
   @override
   initState() {
@@ -492,5 +486,5 @@ class _PreviewScreenState extends State<PreviewScreen> {
   }
 }
 
-
+*/
 

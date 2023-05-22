@@ -3,31 +3,36 @@ import 'dart:convert';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:fieldapp_rcm/step_form.dart';
+import 'package:fieldapp_rcm/task.dart';
 import 'package:fieldapp_rcm/task/collection.dart';
 import 'package:fieldapp_rcm/task/customer.dart';
 import 'package:fieldapp_rcm/task/pilot_process.dart';
 import 'package:fieldapp_rcm/task/portfolio.dart';
 import 'package:fieldapp_rcm/task/team.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:http/http.dart' as http;
 
 import 'http_online.dart';
 
 class Bucket extends StatefulWidget {
-  final Function(String) onTask;
+  /*final Function(String) onTask;
 
-  final Function(String) onSubTask;
-  final Function(List?) taskResult;
+  //final Function(String) onSubTask;
+  //final Function(List?) taskResult;
   final Function(String) onregionselected;
   final Function(String?) onareaselected;
 
   Bucket(
-      {required this.onregionselected,
-      required this.onareaselected,
-      required this.onTask,
-      required this.onSubTask,
-      required this.taskResult});
+      {
+      //required this.onregionselected,
+   */
+      //required this.onareaselected,
+     // required this.onTask,
+      //required this.onSubTask,
+      //required this.taskResult});**/
 
   @override
   BucketState createState() => new BucketState();
@@ -161,196 +166,98 @@ class BucketState extends State<Bucket> {
       rethrow;
     }
   }
-
+  final _Key = GlobalKey<FormBuilderState>();
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Add new task"),
       ),
-      body: Form(
-        key: _formKey,
-        child:
+      body: SingleChildScrollView(
+        child: FormBuilder(
+            key: _Key,
+            child: Column(children: [
+              FormBuilderTextField(
+                name: "FIRST_NAME",
+                decoration: InputDecoration(labelText: 'First Name'),
+              ),
+          FormBuilderDropdown(
+              name: 'dropdown',
+          isExpanded: true,
 
-        Column(
-          children: [
-            SizedBox(
-              height: 10,
-            ),
-            AppDropDown(
-                disable: true,
-                label: "Region",
-                hint: "Region",
-                items: agentList,
-                onChanged: (value) {
-                  widget.onregionselected(value!);
+          items: dataTask.keys.map((option) {
+
+            return DropdownMenuItem(
+              child: Text("$option"),
+              value: option,
+            );
+          }).toList(),
+          ),
+
+              FormBuilderRadioGroup(
+                onChanged: (val) {
+                  print(val);
                   setState(() {
-                    regionselected = value;
+                    selectedTask = val!;
                   });
-                  //_getArea();
-                }),
-            SizedBox(
-              height: 8,
-            ),
-            AppDropDown(
-                disable: true,
-                label: "Area",
-                hint: "Area",
-                items: agentList,
-                onChanged: (value) {
-                  setState(() {
-                    selectedarea = value;
-                  });
-                  widget.onareaselected(value!);
-                }),
-            SizedBox(
-              height: 8,
-            ),
-            AppDropDown(
-                disable: true,
-                label: "Task Title",
-                hint: "Task Title",
-                items: dataTask.keys.toList(),
-                onChanged: (value) {
-                  print(value);
-                  // widget.onTask(value!);
-                  selectedTask = value;
-                  setState(() {
-                    // selectedTask = value;
-                  });
-                  //widget.onTask(value);
-                }),
-            SizedBox(
-              height: 8,
-            ),
-            AppDropDown(
-                disable: false,
-                label: "Sub Task",
-                hint: "Sub Task",
-                items: dataTask[selectedTask] ?? [],
-                onChanged: (value) {
-                  print(value);
-                  setState(() {
-                     selectedSubTask = value!;
-                  });
-                  widget.onSubTask!(value!);
-                }),
-            SizedBox(
-              height: 8,
-            ),
-            if (selectedTask == 'Portfolio Quality' && selectedSubTask != null)
-              Column(
-                children: [
-                  Portfolio(
-                      subtask: selectedSubTask,
-                      onSave: (value) {
-                        widget.taskResult(value);
-                      }
+                },
+                name: "Task",
+                orientation: OptionsOrientation.vertical,
+                decoration: InputDecoration(
+                  labelText: "Task",
+                  fillColor: Colors.red,
+                  focusColor: Colors.blue,
+                  hoverColor: Colors.yellow,
+                ),
+                options: dataTask.keys.map(
+                      (task) => FormBuilderFieldOption(
+                    value: task,
+                    child: Text(task),
                   ),
-                  ElevatedButton(
-                      onPressed: (){
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ActionScreen(
-                                  customers: [selectedarea],
-                                  onChange:
-                                      (value) {
-                                  }, Area: selectedarea!,
-                                  region: regionselected,
-                                  task: selectedTask,
-                                  subtask: selectedSubTask,)));
-                      }, child: Text('Next'))
-                ],
-              ),
-            if (selectedTask == 'Team Management' && selectedSubTask != null)
-              Column(
-                children: [
-                  Team(
-                    onSave: (value) {
-                      widget.taskResult(value);
-                    },
-                    subtask: selectedSubTask??'',),
-                  ElevatedButton(
-                      onPressed: (){
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => TeamActionScreen(
-                                  customers: ['_myActivities',"gg"],
-                                  onChange:
-                                      (value) {
-                                  },
-                                  Area: selectedarea!,
-                                  region: regionselected,
-                                  task: selectedTask,
-                                  subtask: selectedSubTask,)));
-                      }, child: Text('Next'))
-                ],
-              ),
-            if (selectedTask == 'Collection Drive' && selectedSubTask != null)
-              Column(
-                children: [
-                  TaskAdd(),
-                  ElevatedButton(
-                      onPressed: (){
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ActionScreen(
-                                  customers: [selectedarea],
-                                  onChange:
-                                      (value) {
-                                  }, Area: selectedarea!,
-                                  region: regionselected,
-                                  task: selectedTask,
-                                  subtask: selectedSubTask,)));
-                      }, child: Text('Next'))
-                ],
-              ),
-            if (selectedTask == 'Pilot/Process Management' && selectedSubTask != null)
-              Column(
-                children: [
-                  TaskAdd(),
-                  ElevatedButton(
-                      onPressed: (){
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ActionScreen(
-                                  customers: [selectedarea],
-                                  onChange:
-                                      (value) {
-                                  }, Area: selectedarea!,
-                                  region: regionselected,
-                                  task: selectedTask,
-                                  subtask: selectedSubTask,)));
-                      }, child: Text('Next'))
-                ],
-              ),
-            if (selectedTask == 'Customer Management' && selectedSubTask != null)
-              Column(
-                children: [
-                  TaskAdd(),
-                  ElevatedButton(
-                      onPressed: (){
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ActionScreen(
-                                  customers: [selectedarea],
-                                  onChange:
-                                      (value) {
-                                  }, Area: selectedarea!,
-                                  region: regionselected,
-                                  task: selectedTask,
-                                  subtask: selectedSubTask,)));
-                      }, child: Text('Next'))
-                ],
-              ),
+                ).toList(),
 
+              ),
+            Builder(
+                 builder: (context) {
+    switch (selectedTask) {
+        case 'Collection Drive':
+          return Column(
+            children: [
+              Text("Collection Drive")
+            ],
+          );
+      case 'Team Management':
+        return Column(
+          children: [
+            Text("Team Management")
           ],
+        );
+      case 'Portfolio Quality':
+        return Column(
+          children: [
+            Text("Portfolio Quality")
+          ],
+        );
+      case 'Collection Drive':
+        return Column(
+          children: [
+            Text("Collection Drive")
+          ],
+        );
+        case '':
+          return Column();
+        default :
+          return Column();
+
+    }
+
+        })
+
+
+
+            ]
+    )
         ),
-      ),
+      )
     );
   }
 }
@@ -364,10 +271,97 @@ class TaskAdd extends StatefulWidget{
 
 }
 class TaskAddState extends State<TaskAdd>{
+  List data = [];
+  initState() {
+    listItems("welcome_calls".replaceAll(" ", "_"));
+  }
+  Future<StorageItem?> listItems(key) async {
+    try {
+      StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
+      operation = await Amplify.Storage.list(
+        options: const StorageListOptions(
+          accessLevel: StorageAccessLevel.guest,
+          pluginOptions: S3ListPluginOptions.listAll(),
+        ),
+      );
+
+      Future<StorageListResult<StorageItem>> result = operation.result;
+      List<StorageItem> resultList = (await operation.result).items;
+      resultList = resultList.where((file) => file.key.contains(key)).toList();
+      if (resultList.isNotEmpty) {
+        // Sort the files by the last modified timestamp in descending order
+        resultList.sort((a, b) => b.lastModified!.compareTo(a.lastModified!));
+        StorageItem latestFile = resultList.first;
+        print(latestFile.key);
+        getTask(latestFile.key);
+        return resultList.first;
+
+      } else {
+        print('No files found in the S3 bucket with key containing "$key".');
+        return null;
+      }
+
+      for (StorageItem item in resultList) {
+        print('Key: ${item.key}');
+        print('Last Modified: ${item.lastModified}');
+        // Access other properties as needed
+      }
+
+      safePrint('Got items: ${resultList.length}');
+    } on StorageException catch (e) {
+      safePrint('Error listing items: $e');
+    }
+  }
+  Future<void> getTask(key) async {
+    List<Map<String, dynamic>>  uniqueAgentList = [];
+
+    try {
+      StorageGetPropertiesResult<StorageItem> result =
+      await Amplify.Storage.getProperties(
+        key: key,
+      ).result;
+      StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
+          key: key)
+          .result;
+      final response = await http.get(urlResult.url);
+      final jsonData = jsonDecode(response.body);
+      //List<dynamic> jsonDataList = jsonDecode(jsonData);
+      for (var item in jsonData) {
+        String agent = item['Agent'];
+        String unreachabilityRate = item['%Unreachabled rate within SLA'];
+        Map<String, String> dataagent = {
+          'display': '$agent - $unreachabilityRate',
+          'value': '$agent - $unreachabilityRate',
+        };
+        Map<String, dynamic> dataItem = {
+          'display': '$agent - $unreachabilityRate',
+          'value': '$agent - $unreachabilityRate',
+        };
+        data?.add(dataItem);
+        uniqueAgentList.add(dataItem);
+      }
+
+      setState(() {
+        safePrint('File team: $uniqueAgentList');
+      });
+    } on StorageException catch (e) {
+      safePrint('Could not retrieve properties: ${e.message}');
+      rethrow;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return  Column(
+    return  Scaffold(
+      appBar: AppBar(),
+      body: Column(
+        children: [
+          Text("Visiting unreachable welcome call clients"),
+          Text("Visiting unreachable welcome call clients".replaceAll(" ", "_")),
+          Text("Visiting unreachable welcome call clients".replaceAll(" ", "_")),
+        ],
+      ),
+
     );
   }
 
